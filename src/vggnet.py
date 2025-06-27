@@ -11,10 +11,14 @@ from six.moves import cPickle
 import numpy as np
 import scipy.misc
 import os
+import imageio
 
 from evaluate import evaluate_class
 from DB import Database
 
+from torchvision import transforms
+
+os.environ['TORCH_HOME'] = os.path.join(os.path.dirname(__file__), 'cache')
 
 '''
   downloading problem in mac OSX should refer to this answer:
@@ -165,8 +169,9 @@ class VGGNetFeat(object):
       data = db.get_data()
       for d in data.itertuples():
         d_img, d_cls = getattr(d, "img"), getattr(d, "cls")
-        img = scipy.misc.imread(d_img, mode="RGB")
-        img = img[:, :, ::-1]  # switch to BGR
+        img = imageio.imread(d_img)
+        if img.shape[-1] == 4:  # RGBA转RGB
+            img = img[..., :3]
         img = np.transpose(img, (2, 0, 1)) / 255.
         img[0] -= means[0]  # reduce B's mean
         img[1] -= means[1]  # reduce G's mean
@@ -202,3 +207,28 @@ if __name__ == "__main__":
     print("Class {}, MAP {}".format(cls, MAP))
     cls_MAPs.append(MAP)
   print("MMAP", np.mean(cls_MAPs))
+
+# ========== 新增：单张图片VGG特征提取函数 ==========
+def extract_vgg_feature(img):
+    """
+    输入: PIL.Image
+    输出: numpy.ndarray (VGG avg池化层特征)
+    """
+    preprocess = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+    ])
+    img_tensor = preprocess(img).unsqueeze(0)  # (1, 3, 224, 224)
+    img_tensor = img_tensor[:, [2,1,0], :, :]  # RGB->BGR
+    img_tensor[:, 0, :, :] -= means[0]
+    img_tensor[:, 1, :, :] -= means[1]
+    img_tensor[:, 2, :, :] -= means[2]
+    vgg_model = VGGNet(requires_grad=False, model=VGG_model)
+    vgg_model.eval()
+    if use_gpu:
+        vgg_model = vgg_model.cuda()
+        img_tensor = img_tensor.cuda()
+    with torch.no_grad():
+        feat = vgg_model(img_tensor)[pick_layer]  # 取avg池化层
+        feat = feat.cpu().numpy().flatten()
+    return feat

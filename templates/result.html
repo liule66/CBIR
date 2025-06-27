@@ -104,15 +104,26 @@
                         border-radius:16px;box-shadow:0 4px 24px rgba(0,123,255,0.15);background:#f4f8ff;margin-bottom:18px;">
         </div>
         {% endif %}
-        <div class="d-flex flex-wrap justify-content-center mb-4">
-            {% for img in result_imgs %}
-            <div class="result-card">
-                <img src="/static/{{ img }}" class="result-img" alt="结果图片" data-bs-toggle="modal" data-bs-target="#imgModal" data-img="/static/{{ img }}">
-                <div class="img-caption">结果 {{ loop.index }}</div>
-                <div class="score {% if result_scores[loop.index0] > 0.8 %}score-high{% elif result_scores[loop.index0] > 0.5 %}score-mid{% else %}score-low{% endif %}">相似度：{{ '%.4f' % result_scores[loop.index0] }}</div>
+        {% for result in all_results %}
+        <div class="mb-4">
+            <h4 style="color:#333;">{{ result.feature_name }} 检索结果</h4>
+            {% if result.error %}
+                <div style="color:red;">出错：{{ result.error }}</div>
+            {% else %}
+            <div class="d-flex flex-wrap justify-content-center mb-2">
+                {% for img in result.result_imgs %}
+                <div class="result-card">
+                    <img src="/static/{{ img }}" class="result-img" alt="结果图片">
+                    <div class="img-caption">结果 {{ loop.index }}</div>
+                    <div class="score {% if result.result_scores[loop.index0] > 0.8 %}score-high{% elif result.result_scores[loop.index0] > 0.5 %}score-mid{% else %}score-low{% endif %}">
+                        相似度：{{ '%.4f' % result.result_scores[loop.index0] }}
+                    </div>
+                </div>
+                {% endfor %}
             </div>
-            {% endfor %}
+            {% endif %}
         </div>
+        {% endfor %}
         <a href="/" class="btn btn-outline-primary">返回首页</a>
         <div class="footer">
             <span>© 2024 liule66 | CBIR 图像检索系统</span>

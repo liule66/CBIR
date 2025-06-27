@@ -12,6 +12,7 @@ from six.moves import cPickle
 import numpy as np
 import scipy.misc
 import os
+import imageio
 
 n_bin    = 10
 n_slice  = 6
@@ -89,7 +90,7 @@ class HOG(object):
     if isinstance(input, np.ndarray):  # examinate input type
       img = input.copy()
     else:
-      img = scipy.misc.imread(input, mode='RGB')
+      img = imageio.imread(input)
     height, width, channel = img.shape
   
     if type == 'global':

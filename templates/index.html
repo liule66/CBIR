@@ -8,61 +8,101 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background: #f8f9fa;
+            min-height: 100vh;
+            background: url("/material/background.jpg") no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+        }
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(255,255,255,0.28);
+            z-index: 0;
+            pointer-events: none;
         }
         .container {
-            max-width: 480px;
-            margin-top: 60px;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-            padding: 32px 24px 24px 24px;
+            position: relative;
+            z-index: 1;
+            max-width: 400px;
+            margin: 80px auto 0 auto;
+            background: rgba(255,255,255,0.68);
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            padding: 38px 30px 28px 30px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
         .logo {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 16px;
+            width: 56px;
+            height: 56px;
+            margin-bottom: 18px;
+            opacity: 0.92;
+        }
+        h2 {
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #222;
+            margin-bottom: 28px;
         }
         .form-label {
             font-weight: 500;
+            color: #222;
+            margin-bottom: 8px;
+        }
+        .form-control {
+            margin-bottom: 22px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.85);
+            border: 1px solid #e0e0e0;
+            font-size: 1.05rem;
+            box-shadow: none;
+            transition: border 0.2s;
+        }
+        .form-control:focus {
+            border: 1.5px solid #007aff;
+            box-shadow: 0 0 0 2px rgba(0,122,255,0.08);
         }
         .btn-primary {
             width: 100%;
             font-size: 1.1rem;
             padding: 10px 0;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,123,255,0.08);
+            background: linear-gradient(90deg, #007aff 60%, #4fc3f7 100%);
+            border: none;
         }
-        .form-select, .form-control {
-            margin-bottom: 18px;
+        .btn-primary:active, .btn-primary:focus {
+            background: linear-gradient(90deg, #005ecb 60%, #039be5 100%);
         }
         .footer {
             margin-top: 32px;
-            color: #aaa;
-            font-size: 0.95rem;
+            color: #888;
+            font-size: 0.97rem;
             text-align: center;
+            opacity: 0.85;
+            letter-spacing: 0.5px;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin-top: 30px;
+                padding: 18px 6px 12px 6px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="overlay"></div>
     <div class="container text-center">
         <img src="https://cdn-icons-png.flaticon.com/512/2922/2922510.png" class="logo" alt="logo"/>
-        <h2 class="mb-4">CBIR内容检索系统</h2>
+        <h2>CBIR内容检索系统</h2>
         <form action="/search" method="post" enctype="multipart/form-data" class="text-start">
             <label for="file" class="form-label">选择图片：</label>
             <input type="file" name="file" id="file" class="form-control" required accept="image/*">
-
-            <label for="feature_type" class="form-label">选择特征类型：</label>
-            <select name="feature_type" id="feature_type" class="form-select">
-                <option value="color">颜色特征</option>
-                <option value="texture">纹理特征</option>
-                <option value="shape">形状特征</option>
-                <option value="resnet">ResNet特征</option>
-                <option value="vgg">VGG特征</option>
-                <option value="fusion">融合特征</option>
-            </select>
             <button type="submit" class="btn btn-primary mt-2">开始检索</button>
         </form>
         <div class="footer">
-            <span>© 2024 liule66 | CBIR 图像检索系统</span>
+            <span>© 2025 liule66 | CBIR 图像检索系统</span>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

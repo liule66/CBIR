@@ -10,6 +10,7 @@ import numpy as np
 import scipy.misc
 from math import sqrt
 import os
+import imageio
 
 
 stride = (1, 1)
@@ -104,7 +105,7 @@ class Edge(object):
     if isinstance(input, np.ndarray):  # examinate input type
       img = input.copy()
     else:
-      img = scipy.misc.imread(input, mode='RGB')
+      img = imageio.imread(input, mode='RGB')
     height, width, channel = img.shape
   
     if type == 'global':

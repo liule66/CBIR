@@ -12,10 +12,13 @@ from gabor import Gabor
 from HOG   import HOG
 from vggnet import VGGNetFeat
 from resnet import ResNetFeat
+from resnet import extract_resnet_feature
+from vggnet import extract_vgg_feature
 
 import numpy as np
 import itertools
 import os
+import imageio
 
 
 d_type   = 'd1'
@@ -145,3 +148,24 @@ if __name__ == "__main__":
     print("Class {}, MAP {}".format(cls, MAP))
     cls_MAPs.append(MAP)
   print("MMAP", np.mean(cls_MAPs))
+
+# ========== 新增：单张图片融合特征提取函数 ==========
+def extract_fusion_feature(img):
+    """
+    输入: PIL.Image
+    输出: numpy.ndarray (融合特征)
+    """
+    img_np = np.array(img)
+    color_feat = Color().histogram(img_np)
+    texture_feat = Daisy().histogram(img_np)
+    shape_feat = HOG().histogram(img_np)
+    resnet_feat = extract_resnet_feature(img)
+    vgg_feat = extract_vgg_feature(img)
+    fusion_feat = np.concatenate([
+        np.array(color_feat).flatten(),
+        np.array(texture_feat).flatten(),
+        np.array(shape_feat).flatten(),
+        np.array(resnet_feat).flatten(),
+        np.array(vgg_feat).flatten()
+    ])
+    return fusion_feat

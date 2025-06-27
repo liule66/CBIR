@@ -125,7 +125,7 @@ Thumbs.db
 /faiss_index/
 
 # 缓存和临时文件
-/cache/
+cache/
 
 # 评估结果
 /result/
