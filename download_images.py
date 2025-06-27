@@ -1,21 +1,39 @@
-from simple_image_download import simple_image_download as simp
+from bing_image_downloader import downloader
+import os
 
-# 实例化下载器
-response = simp.simple_image_download
+# --- 配置区 ---
+# 定义你想要下载的图片主题
+keywords = [
+    # "Mount Fuji landscape",    # 使用更具体的描述，如 "风景"，可以提高图片质量
+    # "Eiffel Tower",
+    # "Golden Retriever puppy playing",
+    # "mygo", 
+    "孤独摇滚波奇酱",
+    "千早爱音",
+    "长崎素世",
+    "高松灯",
+]
 
-# 定义你要下载的图片主题和数量
-# 格式：{"关键词": 数量}
-keywords_and_limits = {
-    "Mount Fuji": 80,         # 下载80张关于“富士山”的图片
-    "Eiffel Tower": 80,       # 下载80张关于“埃菲尔铁塔”的图片
-    "Golden Retriever puppy": 80, # 下载80张关于“金毛幼犬”的图片
-    "mygo": 80,
-}
+# 为每个主题下载的图片数量
+limit_per_keyword = 30
 
-# 循环下载
-for keyword, limit in keywords_and_limits.items():
-    print(f"开始下载 '{keyword}', 数量: {limit} 张...")
-    response().download(keywords=keyword, limit=limit)
-    print(f"'{keyword}' 下载完成！\n")
+# 指定存放所有图片的总文件夹名
+output_dir = 'image_library'
+# --- 配置区结束 ---
 
-print("所有图片已下载到 simple_images 文件夹中。")
+
+# 循环下载每一个关键词
+for query in keywords:
+    print(f"开始下载 '{query}', 数量: {limit_per_keyword} 张...")
+    downloader.download(
+        query,
+        limit=limit_per_keyword,
+        output_dir=output_dir,
+        adult_filter_off=True,
+        force_replace=False,
+        timeout=60,
+        verbose=True  # 打印详细下载过程
+    )
+    print(f"'{query}' 下载完成！图片保存在 '{output_dir}' 文件夹下的同名子文件夹中。\n")
+
+print("所有下载任务已完成！")

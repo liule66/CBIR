@@ -126,6 +126,7 @@ Thumbs.db
 
 # 缓存和临时文件
 cache/
+/image_library/
 
 # 评估结果
 /result/

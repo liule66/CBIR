@@ -118,6 +118,7 @@
                     <div class="score {% if result.result_scores[loop.index0] > 0.8 %}score-high{% elif result.result_scores[loop.index0] > 0.5 %}score-mid{% else %}score-low{% endif %}">
                         相似度：{{ '%.4f' % result.result_scores[loop.index0] }}
                     </div>
+                    <a href="/static/{{ img }}" download class="btn btn-outline-primary btn-sm mt-2" style="border-radius:8px;min-width:80px;">下载</a>
                 </div>
                 {% endfor %}
             </div>
