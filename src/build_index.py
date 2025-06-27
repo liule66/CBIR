@@ -19,10 +19,18 @@ if not os.path.exists(dataset_dir):
 print(f"正在处理dataset目录: {dataset_dir}")
 
 for fname in os.listdir(dataset_dir):
-    if fname.lower().endswith(('.jpg', '.png', '.jpeg')):
+    if fname.lower().endswith(('.jpg', '.png', '.jpeg', '.gif')):
         img_path = os.path.join(dataset_dir, fname)
         print(f"处理图片: {fname}")
-        img = Image.open(img_path).convert('RGB')
+        img = Image.open(img_path)
+        # 如果是GIF，取第一帧
+        if img.format == 'GIF':
+            try:
+                img.seek(0)
+            except Exception as e:
+                print(f"警告：无法处理GIF第一帧: {fname}, 错误: {e}")
+                continue
+        img = img.convert('RGB')
         feat = extract_resnet_feature(img)  # shape: (feature_dim,)
         if feat is not None:
             features.append(feat)

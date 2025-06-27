@@ -89,7 +89,14 @@
     <div class="container text-center">
         <img src="https://cdn-icons-png.flaticon.com/512/2922/2922510.png" class="logo" alt="logo"/>
         <h2 class="mb-4">检索结果</h2>
-        {% if original_img_path %}
+        {% if original_img_data %}
+        <div class="mb-4">
+            <div style="font-size:1.08rem;color:#007bff;margin-bottom:6px;">本次上传的原图：</div>
+            <img src="{{ original_img_data }}" alt="原图"
+                 style="width:500px;height:500px;object-fit:contain;border:3px solid #007bff;
+                        border-radius:16px;box-shadow:0 4px 24px rgba(0,123,255,0.15);background:#f4f8ff;margin-bottom:18px;">
+        </div>
+        {% elif original_img_path %}
         <div class="mb-4">
             <div style="font-size:1.08rem;color:#007bff;margin-bottom:6px;">本次上传的原图：</div>
             <img src="/static/{{ original_img_path }}" alt="原图"
