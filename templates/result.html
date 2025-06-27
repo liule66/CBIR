@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>检索结果</title>
+</head>
+<body>
+    <h2>检索结果</h2>
+    {% for img in result_imgs %}
+        <img src="/static/{{ img }}" width="200" style="margin:10px;">
+    {% endfor %}
+    <br>
+    <a href="/">返回</a>
+</body>
+</html> 
