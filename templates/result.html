@@ -1,14 +1,143 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>检索结果</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>检索结果 - CBIR图片检索系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+        .container {
+            max-width: 900px;
+            margin-top: 60px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 32px 24px 24px 24px;
+        }
+        .logo {
+            width: 56px;
+            height: 56px;
+            margin-bottom: 12px;
+        }
+        .result-card {
+            width: 200px;
+            margin: 14px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f6f8fa;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            padding: 12px 8px 10px 8px;
+        }
+        .result-img {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid #eee;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .result-img:hover {
+            transform: scale(1.04);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+        }
+        .img-caption {
+            margin-top: 8px;
+            font-size: 1.05rem;
+            color: #333;
+        }
+        .score {
+            font-size: 0.98rem;
+            font-weight: 500;
+        }
+        .score-high { color: #28a745; }
+        .score-mid { color: #ff9800; }
+        .score-low { color: #e53935; }
+        .footer {
+            margin-top: 32px;
+            color: #aaa;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+        .original-img {
+            width: 300px;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 12px;
+            border: 2px solid #007bff;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+        }
+        /* Modal 动画 */
+        .modal.fade .modal-dialog {
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(.4,2,.6,1);
+        }
+        .modal.fade.show .modal-dialog {
+            transform: scale(1);
+            opacity: 1;
+        }
+    </style>
 </head>
 <body>
-    <h2>检索结果</h2>
-    {% for img in result_imgs %}
-        <img src="/static/{{ img }}" width="200" style="margin:10px;">
-    {% endfor %}
-    <br>
-    <a href="/">返回</a>
+    <div class="container text-center">
+        <img src="https://cdn-icons-png.flaticon.com/512/2922/2922510.png" class="logo" alt="logo"/>
+        <h2 class="mb-4">检索结果</h2>
+        {% if original_img_path %}
+        <div class="mb-4">
+            <div style="font-size:1.08rem;color:#007bff;margin-bottom:6px;">本次上传的原图：</div>
+            <img src="/static/{{ original_img_path }}" alt="原图"
+                 style="width:500px;height:500px;object-fit:contain;border:3px solid #007bff;
+                        border-radius:16px;box-shadow:0 4px 24px rgba(0,123,255,0.15);background:#f4f8ff;margin-bottom:18px;">
+        </div>
+        {% endif %}
+        <div class="d-flex flex-wrap justify-content-center mb-4">
+            {% for img in result_imgs %}
+            <div class="result-card">
+                <img src="/static/{{ img }}" class="result-img" alt="结果图片" data-bs-toggle="modal" data-bs-target="#imgModal" data-img="/static/{{ img }}">
+                <div class="img-caption">结果 {{ loop.index }}</div>
+                <div class="score {% if result_scores[loop.index0] > 0.8 %}score-high{% elif result_scores[loop.index0] > 0.5 %}score-mid{% else %}score-low{% endif %}">相似度：{{ '%.4f' % result_scores[loop.index0] }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        <a href="/" class="btn btn-outline-primary">返回首页</a>
+        <div class="footer">
+            <span>© 2024 liule66 | CBIR 图像检索系统</span>
+        </div>
+    </div>
+
+    <!-- Modal for image preview -->
+    <div class="modal fade" id="imgModal" tabindex="-1" aria-labelledby="imgModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+          <div class="modal-body text-center">
+            <img id="modalImg" src="" style="max-width:100%; max-height:70vh; border-radius:12px;" alt="大图预览">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 点击图片弹出大图
+        document.addEventListener('DOMContentLoaded', function() {
+            var imgModal = document.getElementById('imgModal');
+            var modalImg = document.getElementById('modalImg');
+            document.querySelectorAll('.result-img').forEach(function(img) {
+                img.addEventListener('click', function() {
+                    modalImg.src = this.getAttribute('data-img');
+                });
+            });
+            imgModal.addEventListener('hidden.bs.modal', function () {
+                modalImg.src = '';
+            });
+        });
+    </script>
 </body>
-</html> 
+</html>

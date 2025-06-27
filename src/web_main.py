@@ -1,3 +1,11 @@
+import sys
+import os
+
+from resnet import extract_resnet_feature
+from evaluate import evaluate_class
+
+sys.path.insert(0, os.path.dirname(__file__))
+
 from fastapi import FastAPI, File, UploadFile, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -6,8 +14,6 @@ import numpy as np
 import faiss
 from PIL import Image
 import io
-import os
-from resnet import extract_resnet_feature  # 请确保此函数已实现
 
 app = FastAPI()
 
@@ -30,11 +36,38 @@ with open(os.path.join(faiss_index_dir, 'img_paths.txt'), encoding='utf-8') as f
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
+
 @app.post("/search", response_class=HTMLResponse)
 async def search(request: Request, file: UploadFile = File(...)):
     img_bytes = await file.read()
     img = Image.open(io.BytesIO(img_bytes)).convert('RGB')
+    # 保存原图到 dataset/ 目录，文件名可用 file.filename 或自定义唯一名
+    original_img_path = f"upload_{file.filename}"
+    save_path = os.path.join(dataset_dir, original_img_path)
+    img.save(save_path)
+    # 提取特征并检索
     feat = extract_resnet_feature(img).astype('float32').reshape(1, -1)
-    D, I = index.search(feat, 5)  # 返回5个最相似
+    D, I = index.search(feat, 5)
     result_imgs = [img_paths[i] for i in I[0]]
-    return templates.TemplateResponse("result.html", {"request": request, "result_imgs": result_imgs}) 
+    # 距离归一化为相似度分数（0~1，距离越小分数越高）
+    d_min, d_max = float(np.min(D[0])), float(np.max(D[0]))
+    if d_max > d_min:
+        result_scores = [1 - (float(d) - d_min) / (d_max - d_min) for d in D[0]]
+    else:
+        result_scores = [1.0 for _ in D[0]]
+    return templates.TemplateResponse(
+        "result.html",
+        {
+            "request": request,
+            "result_imgs": result_imgs,
+            "result_scores": result_scores,
+            "original_img_path": original_img_path
+        }
+    )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    # 让uvicorn在 0.0.0.0:8000 运行服务
+    # --reload 参数可以在你修改代码后自动重启服务，非常方便
+    uvicorn.run("web_main:app", host="0.0.0.0", port=8000, reload=True)

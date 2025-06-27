@@ -66,7 +66,8 @@ python src/build_index.py
 
 5. **启动服务**
 ```bash
-uvicorn src.web_main:app --reload --host 0.0.0.0 --port 8000
+cd src
+uvicorn web_main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 6. **访问系统**
@@ -124,7 +125,8 @@ python src/build_index.py
 ### 3. 启动Web服务
 
 ```bash
-uvicorn src.web_main:app --reload --host 0.0.0.0 --port 8000
+cd src
+uvicorn web_main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### 4. 使用Web界面

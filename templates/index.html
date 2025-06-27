@@ -1,13 +1,70 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>图片检索</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CBIR图片检索系统</title>
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+        .container {
+            max-width: 480px;
+            margin-top: 60px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            padding: 32px 24px 24px 24px;
+        }
+        .logo {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+        }
+        .form-label {
+            font-weight: 500;
+        }
+        .btn-primary {
+            width: 100%;
+            font-size: 1.1rem;
+            padding: 10px 0;
+        }
+        .form-select, .form-control {
+            margin-bottom: 18px;
+        }
+        .footer {
+            margin-top: 32px;
+            color: #aaa;
+            font-size: 0.95rem;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
-    <h2>上传图片进行相似检索</h2>
-    <form action="/search" enctype="multipart/form-data" method="post">
-        <input name="file" type="file" accept="image/*" required>
-        <input type="submit" value="检索">
-    </form>
+    <div class="container text-center">
+        <img src="https://cdn-icons-png.flaticon.com/512/2922/2922510.png" class="logo" alt="logo"/>
+        <h2 class="mb-4">CBIR内容检索系统</h2>
+        <form action="/search" method="post" enctype="multipart/form-data" class="text-start">
+            <label for="file" class="form-label">选择图片：</label>
+            <input type="file" name="file" id="file" class="form-control" required accept="image/*">
+
+            <label for="feature_type" class="form-label">选择特征类型：</label>
+            <select name="feature_type" id="feature_type" class="form-select">
+                <option value="color">颜色特征</option>
+                <option value="texture">纹理特征</option>
+                <option value="shape">形状特征</option>
+                <option value="resnet">ResNet特征</option>
+                <option value="vgg">VGG特征</option>
+                <option value="fusion">融合特征</option>
+            </select>
+            <button type="submit" class="btn btn-primary mt-2">开始检索</button>
+        </form>
+        <div class="footer">
+            <span>© 2024 liule66 | CBIR 图像检索系统</span>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html> 
+</html>
