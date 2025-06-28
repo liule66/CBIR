@@ -12,6 +12,7 @@ import numpy as np
 import scipy.misc
 import os
 import imageio
+import gc
 
 from evaluate import evaluate_class
 from DB import Database
@@ -61,6 +62,28 @@ cache_dir = 'cache'
 if not os.path.exists(cache_dir):
   os.makedirs(cache_dir)
 
+# 全局模型实例，避免重复创建
+_vgg_model = None
+
+def get_vgg_model():
+    """获取VGG模型实例（单例模式）"""
+    global _vgg_model
+    if _vgg_model is None:
+        _vgg_model = VGGNet(requires_grad=False, model=VGG_model)
+        _vgg_model.eval()
+        if use_gpu:
+            _vgg_model = _vgg_model.cuda()
+    return _vgg_model
+
+def clear_vgg_model():
+    """清理VGG模型实例"""
+    global _vgg_model
+    if _vgg_model is not None:
+        del _vgg_model
+        _vgg_model = None
+        if use_gpu:
+            torch.cuda.empty_cache()
+        gc.collect()
 
 class VGGNet(VGG):
   def __init__(self, pretrained=True, model='vgg16', requires_grad=False, remove_fc=False, show_params=False):
@@ -214,21 +237,39 @@ def extract_vgg_feature(img):
     输入: PIL.Image
     输出: numpy.ndarray (VGG avg池化层特征)
     """
-    preprocess = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-    ])
-    img_tensor = preprocess(img).unsqueeze(0)  # (1, 3, 224, 224)
-    img_tensor = img_tensor[:, [2,1,0], :, :]  # RGB->BGR
-    img_tensor[:, 0, :, :] -= means[0]
-    img_tensor[:, 1, :, :] -= means[1]
-    img_tensor[:, 2, :, :] -= means[2]
-    vgg_model = VGGNet(requires_grad=False, model=VGG_model)
-    vgg_model.eval()
-    if use_gpu:
-        vgg_model = vgg_model.cuda()
-        img_tensor = img_tensor.cuda()
-    with torch.no_grad():
-        feat = vgg_model(img_tensor)[pick_layer]  # 取avg池化层
-        feat = feat.cpu().numpy().flatten()
-    return feat
+    try:
+        # 获取模型实例（单例模式）
+        vgg_model = get_vgg_model()
+        
+        # 预处理图片
+        preprocess = transforms.Compose([
+            transforms.Resize((224, 224)),
+            transforms.ToTensor(),
+        ])
+        img_tensor = preprocess(img).unsqueeze(0)  # (1, 3, 224, 224)
+        img_tensor = img_tensor[:, [2,1,0], :, :]  # RGB->BGR
+        img_tensor[:, 0, :, :] -= means[0]
+        img_tensor[:, 1, :, :] -= means[1]
+        img_tensor[:, 2, :, :] -= means[2]
+        
+        if use_gpu:
+            img_tensor = img_tensor.cuda()
+        
+        # 提取特征
+        with torch.no_grad():  # 禁用梯度计算以节省内存
+            feat = vgg_model(img_tensor)[pick_layer]  # 取avg池化层
+            feat = feat.cpu().numpy().flatten()
+            
+            # 清理中间变量
+            del img_tensor
+            if use_gpu:
+                torch.cuda.empty_cache()
+            
+            return feat
+    except Exception as e:
+        print(f"Error extracting VGG feature: {e}")
+        # 清理内存
+        if use_gpu:
+            torch.cuda.empty_cache()
+        gc.collect()
+        return None

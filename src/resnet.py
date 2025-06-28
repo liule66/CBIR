@@ -15,6 +15,7 @@ import scipy.misc
 import os
 from PIL import Image
 import imageio
+import gc
 
 from evaluate import evaluate_class
 from DB import Database
@@ -63,6 +64,28 @@ cache_dir = 'cache'
 if not os.path.exists(cache_dir):
   os.makedirs(cache_dir)
 
+# 全局模型实例，避免重复创建
+_resnet_model = None
+
+def get_resnet_model():
+    """获取ResNet模型实例（单例模式）"""
+    global _resnet_model
+    if _resnet_model is None:
+        _resnet_model = ResidualNet(model=RES_model)
+        _resnet_model.eval()
+        if use_gpu:
+            _resnet_model = _resnet_model.cuda()
+    return _resnet_model
+
+def clear_resnet_model():
+    """清理ResNet模型实例"""
+    global _resnet_model
+    if _resnet_model is not None:
+        del _resnet_model
+        _resnet_model = None
+        if use_gpu:
+            torch.cuda.empty_cache()
+        gc.collect()
 
 # from https://github.com/pytorch/vision/blob/master/torchvision/models/resnet.py
 model_urls = {
@@ -178,33 +201,42 @@ def extract_resnet_feature(img):
     Returns:
         feature: numpy array, shape (512,)
     """
-    # 初始化模型
-    res_model = ResidualNet(model=RES_model)
-    res_model.eval()
-    if use_gpu:
-        res_model = res_model.cuda()
-    
-    # 预处理图片
-    img_array = np.array(img)
-    img_array = img_array[:, :, ::-1]  # RGB to BGR
-    img_array = np.transpose(img_array, (2, 0, 1)) / 255.
-    img_array[0] -= means[0]  # reduce B's mean
-    img_array[1] -= means[1]  # reduce G's mean
-    img_array[2] -= means[2]  # reduce R's mean
-    img_array = np.expand_dims(img_array, axis=0)
-    
-    # 提取特征
     try:
-        if use_gpu:
-            inputs = torch.autograd.Variable(torch.from_numpy(img_array).cuda().float())
-        else:
-            inputs = torch.autograd.Variable(torch.from_numpy(img_array).float())
-        feature = res_model(inputs)[pick_layer]
-        feature = feature.data.cpu().numpy().flatten()
-        feature /= np.sum(feature)  # normalize
-        return feature
+        # 获取模型实例（单例模式）
+        res_model = get_resnet_model()
+        
+        # 预处理图片
+        img_array = np.array(img)
+        img_array = img_array[:, :, ::-1]  # RGB to BGR
+        img_array = np.transpose(img_array, (2, 0, 1)) / 255.
+        img_array[0] -= means[0]  # reduce B's mean
+        img_array[1] -= means[1]  # reduce G's mean
+        img_array[2] -= means[2]  # reduce R's mean
+        img_array = np.expand_dims(img_array, axis=0)
+        
+        # 提取特征
+        with torch.no_grad():  # 禁用梯度计算以节省内存
+            if use_gpu:
+                inputs = torch.from_numpy(img_array).cuda().float()
+            else:
+                inputs = torch.from_numpy(img_array).float()
+            
+            feature = res_model(inputs)[pick_layer]
+            feature = feature.cpu().numpy().flatten()
+            feature /= np.sum(feature)  # normalize
+            
+            # 清理中间变量
+            del inputs
+            if use_gpu:
+                torch.cuda.empty_cache()
+            
+            return feature
     except Exception as e:
-        print(f"Error extracting feature: {e}")
+        print(f"Error extracting ResNet feature: {e}")
+        # 清理内存
+        if use_gpu:
+            torch.cuda.empty_cache()
+        gc.collect()
         return None
 
 

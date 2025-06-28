@@ -129,4 +129,3 @@ cat faiss_index/file_mapping.json
 uvicorn web_main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-现在您可以通过Web界面测试新添加的图片是否可以被正确检索到！ 
