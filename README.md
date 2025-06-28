@@ -11,16 +11,19 @@
 - **多种特征提取方法**：支持ResNet、VGG、颜色直方图、HOG等多种特征
 - **高效向量检索**：使用FAISS进行快速相似性搜索
 - **Web界面**：基于FastAPI的现代化Web界面
+- **增量索引**：支持动态添加新图片，无需重新构建整个索引
 - **模块化设计**：易于扩展和维护
 
 ## 功能特性
 
-- 🖼️ 支持多种图像格式（JPG、PNG、JPEG）
+- 🖼️ 支持多种图像格式（JPG、PNG、JPEG、GIF）
 - 🔍 基于深度学习的图像特征提取
 - ⚡ 高效的向量相似性搜索
 - 🌐 现代化的Web用户界面
 - 📊 支持批量处理和索引构建
+- 🔄 **增量索引功能**：动态添加新图片，无需重新处理所有图片
 - 🔧 可配置的特征提取参数
+- 📁 智能文件管理：自动重命名和移动文件
 
 ## 技术栈
 
@@ -61,6 +64,9 @@ python src/cifar2img.py
 
 4. **构建索引**
 ```bash
+# 首次构建完整索引
+python src/build_full_index.py
+# 或者使用增量索引（推荐）
 python src/build_index.py
 ```
 
@@ -79,7 +85,8 @@ uvicorn web_main:app --reload --host 0.0.0.0 --port 8000
 CBIR/
 ├── src/                    # 源代码目录
 │   ├── web_main.py        # FastAPI主应用
-│   ├── build_index.py     # 索引构建脚本
+│   ├── build_index.py     # 增量索引构建脚本
+│   ├── build_full_index.py # 完整索引重建脚本
 │   ├── resnet.py          # ResNet特征提取
 │   ├── vggnet.py          # VGG特征提取
 │   ├── color.py           # 颜色特征提取
@@ -96,11 +103,14 @@ CBIR/
 │   ├── index.html         # 主页
 │   └── result.html        # 结果页
 ├── dataset/               # 图片数据集
+│   └── new/               # 新图片目录（增量索引用）
 ├── faiss_index/           # FAISS索引文件
 ├── cache/                 # 缓存文件
 ├── result/                # 评估结果
 ├── requirements.txt       # 依赖包列表
 ├── README.md             # 项目说明
+├── INCREMENTAL_USAGE.md  # 增量索引使用指南
+├── demo_incremental.py   # 增量索引演示脚本
 └── USAGE.md              # 使用指南
 ```
 
@@ -108,32 +118,88 @@ CBIR/
 
 ### 1. 准备数据集
 
-将图片文件放入 `dataset/` 目录，支持JPG、PNG、JPEG格式。
+将图片文件放入 `dataset/` 目录，支持JPG、PNG、JPEG、GIF格式。
 
 ### 2. 构建索引
 
+#### 首次构建（完整索引）
+```bash
+python src/build_full_index.py
+```
+
+#### 增量索引（推荐）
 ```bash
 python src/build_index.py
 ```
 
 这将：
 - 遍历 `dataset/` 目录中的所有图片
-- 提取ResNet特征
+- 提取多种特征（ResNet、VGG、颜色、纹理、形状等）
 - 构建FAISS索引
 - 保存索引文件到 `faiss_index/` 目录
 
-### 3. 启动Web服务
+### 3. 增量索引（新增图片）
+
+当有新图片需要添加到检索系统时：
+
+1. **将新图片放入 `dataset/new/` 目录**
+```bash
+mkdir -p dataset/new
+# 将新图片复制到 dataset/new/ 目录
+```
+
+2. **运行增量索引**
+```bash
+python src/build_index.py
+```
+
+增量索引功能会：
+- 自动检测 `dataset/new/` 目录中的新图片
+- 提取特征并更新FAISS索引
+- 将新图片移动到 `dataset/` 目录（自动重命名避免冲突）
+- 更新索引中的图片路径
+- 保存文件重命名映射到 `faiss_index/file_mapping.json`
+
+### 4. 演示增量索引功能
+
+
+
+### 5. 启动Web服务
 
 ```bash
 cd src
 uvicorn web_main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 4. 使用Web界面
+### 6. 使用Web界面
 
 1. 打开浏览器访问 http://localhost:8000
 2. 上传一张图片
-3. 系统将返回最相似的5张图片
+3. 系统将返回最相似的5张图片，支持多种特征类型的检索结果
+
+## 增量索引详细说明
+
+### 优势
+- **高效**：只处理新图片，不重新处理现有图片
+- **智能**：自动文件管理和重命名
+- **安全**：保持索引一致性，避免数据丢失
+- **灵活**：支持批量添加和单张添加
+
+### 工作流程
+1. 检测 `dataset/new/` 目录中的新图片
+2. 提取新图片的特征
+3. 更新现有FAISS索引
+4. 移动新图片到主数据集目录
+5. 更新索引中的图片路径
+6. 保存文件重命名映射
+
+### 文件重命名规则
+当新图片与现有图片重名时，系统会自动重命名：
+- `image.jpg` → `image_1.jpg`
+- `image.jpg` → `image_2.jpg`
+- 以此类推
+
+详细使用说明请参考 [INCREMENTAL_USAGE.md](INCREMENTAL_USAGE.md)
 
 ## 配置说明
 
@@ -149,7 +215,6 @@ uvicorn web_main:app --reload --host 0.0.0.0 --port 8000
 在 `src/web_main.py` 中可以修改：
 - 返回结果数量（默认5张）
 - 距离度量方式
-
 
 ## 扩展功能
 

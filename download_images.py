@@ -4,18 +4,11 @@ import os
 # --- 配置区 ---
 # 定义你想要下载的图片主题
 keywords = [
-    # "Mount Fuji landscape",    # 使用更具体的描述，如 "风景"，可以提高图片质量
-    # "Eiffel Tower",
-    # "Golden Retriever puppy playing",
-    # "mygo", 
-    "孤独摇滚波奇酱",
-    "千早爱音",
-    "长崎素世",
-    "高松灯",
+    "dog",
 ]
 
 # 为每个主题下载的图片数量
-limit_per_keyword = 30
+limit_per_keyword = 10
 
 # 指定存放所有图片的总文件夹名
 output_dir = 'image_library'

@@ -131,6 +131,10 @@ cache/
 # 评估结果
 /result/
 
+# 增量索引相关
+# 忽略文件映射文件（包含敏感信息）
+faiss_index/file_mapping.json
+
 # 其他
 *.pkl
 *.pickle

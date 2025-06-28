@@ -103,5 +103,4 @@ evaluate_feats(db, N=2, d_type='d1')
 - Parameter *d_type* means the distance metric you want to use.
 - Function *evaluate_feats* will generate a result file that record performances for all feature concatenation.
 
-## Author
-Po-Chih Huang / [@pochih](http://pochih.github.io/)
+
