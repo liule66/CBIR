@@ -6,10 +6,11 @@ from PIL import Image
 import io
 import base64
 
-from fastapi import FastAPI, File, UploadFile, Request
+from fastapi import FastAPI, File, UploadFile, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from typing import List
 
 # 导入特征提取方法
 from color import Color
@@ -58,7 +59,19 @@ async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/search", response_class=HTMLResponse)
-async def search(request: Request, file: UploadFile = File(...)):
+async def search(
+    request: Request, 
+    file: UploadFile = File(...),
+    features: List[str] = Form(...)
+):
+    # 验证选择的特征类型
+    valid_features = set(feature_methods.keys())
+    selected_features = [f for f in features if f in valid_features]
+    
+    if not selected_features:
+        # 如果没有选择有效特征，默认使用所有特征
+        selected_features = list(valid_features)
+    
     img_bytes = await file.read()
     img = Image.open(io.BytesIO(img_bytes)).convert('RGB')
     # 转为 base64 以便前端展示原图
@@ -68,8 +81,9 @@ async def search(request: Request, file: UploadFile = File(...)):
     original_img_data = f"data:image/png;base64,{img_base64}"
 
     all_results = []
-    for feature_type, extract_func in feature_methods.items():
+    for feature_type in selected_features:
         try:
+            extract_func = feature_methods[feature_type]
             feat = np.array(extract_func(img)).astype('float32').reshape(1, -1)
             features = np.load(os.path.join(faiss_index_dir, f'features_{feature_type}.npy'))
             index = faiss.read_index(os.path.join(faiss_index_dir, f'index_{feature_type}.faiss'))
@@ -100,7 +114,8 @@ async def search(request: Request, file: UploadFile = File(...)):
         {
             "request": request,
             "original_img_data": original_img_data,
-            "all_results": all_results
+            "all_results": all_results,
+            "selected_features": selected_features
         }
     )
 
