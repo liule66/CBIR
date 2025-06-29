@@ -24,7 +24,7 @@
         .container {
             position: relative;
             z-index: 1;
-            max-width: 400px;
+            max-width: 500px;
             margin: 80px auto 0 auto;
             background: rgba(255,255,255,0.68);
             border-radius: 18px;
@@ -124,6 +124,42 @@
             font-weight: 500;
             opacity: 0.85;
         }
+        .feature-selection {
+            background: rgba(255,255,255,0.9);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 22px;
+            border: 1px solid #e0e0e0;
+        }
+        .feature-selection h5 {
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .form-check {
+            margin-bottom: 10px;
+        }
+        .form-check-input:checked {
+            background-color: #007aff;
+            border-color: #007aff;
+        }
+        .form-check-label {
+            color: #555;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .select-all-btn {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        .select-all-btn:hover {
+            background: #e9ecef;
+        }
     </style>
 </head>
 <body>
@@ -134,6 +170,55 @@
         <form id="searchForm" action="/search" method="post" enctype="multipart/form-data" class="text-start">
             <label for="file" class="form-label">选择图片：</label>
             <input type="file" name="file" id="file" class="form-control" required accept="image/*">
+            
+            <!-- 特征选择区域 -->
+            <div class="feature-selection">
+                <h5>选择检索特征类型：</h5>
+                <button type="button" class="select-all-btn" onclick="toggleAllFeatures()">全选/取消全选</button>
+                
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="features" value="color" id="color" checked>
+                    <label class="form-check-label" for="color">
+                        颜色特征 (Color Features)
+                    </label>
+                </div>
+                
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="features" value="texture" id="texture" checked>
+                    <label class="form-check-label" for="texture">
+                        纹理特征 (Texture Features)
+                    </label>
+                </div>
+                
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="features" value="shape" id="shape" checked>
+                    <label class="form-check-label" for="shape">
+                        形状特征 (Shape Features)
+                    </label>
+                </div>
+                
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="features" value="resnet" id="resnet" checked>
+                    <label class="form-check-label" for="resnet">
+                        ResNet特征 (Deep Learning)
+                    </label>
+                </div>
+                
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="features" value="vgg" id="vgg" checked>
+                    <label class="form-check-label" for="vgg">
+                        VGG特征 (Deep Learning)
+                    </label>
+                </div>
+                
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="features" value="fusion" id="fusion" checked>
+                    <label class="form-check-label" for="fusion">
+                        融合特征 (Fusion Features)
+                    </label>
+                </div>
+            </div>
+            
             <button type="submit" class="btn btn-primary mt-2">开始检索</button>
         </form>
         <div class="footer">
@@ -150,8 +235,35 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // 提交表单时显示loading
-        document.getElementById('searchForm').addEventListener('submit', function() {
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            // 检查是否至少选择了一个特征
+            const selectedFeatures = document.querySelectorAll('input[name="features"]:checked');
+            if (selectedFeatures.length === 0) {
+                e.preventDefault();
+                alert('请至少选择一种特征类型进行检索！');
+                return;
+            }
             document.getElementById('loadingOverlay').style.display = 'flex';
+        });
+        
+        // 全选/取消全选功能
+        function toggleAllFeatures() {
+            const checkboxes = document.querySelectorAll('input[name="features"]');
+            const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = !allChecked;
+            });
+        }
+        
+        // 确保至少有一个特征被选中
+        document.querySelectorAll('input[name="features"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const selectedFeatures = document.querySelectorAll('input[name="features"]:checked');
+                if (selectedFeatures.length === 0) {
+                    this.checked = true; // 防止取消最后一个选中的特征
+                }
+            });
         });
     </script>
 </body>

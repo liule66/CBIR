@@ -7,136 +7,442 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background: #f8f9fa;
+            background: #f5f5f7;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #1d1d1f;
         }
         .container {
-            max-width: 900px;
-            margin-top: 60px;
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-            padding: 32px 24px 24px 24px;
+            max-width: 1200px;
+            margin: 40px auto;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            padding: 40px 30px;
+            backdrop-filter: blur(20px);
         }
         .logo {
-            width: 56px;
-            height: 56px;
-            margin-bottom: 12px;
+            width: 64px;
+            height: 64px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1));
         }
+        .page-title {
+            color: #1d1d1f;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 2rem;
+            letter-spacing: -0.5px;
+        }
+        
+        .selected-features {
+            background: #f2f2f2;
+            border: none;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            text-align: center;
+            border: 1px solid #e5e5e7;
+        }
+        .selected-features h5 {
+            color: #1d1d1f;
+            margin-bottom: 16px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .feature-tag {
+            display: inline-block;
+            background: #007aff;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin: 4px 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .feature-tag:hover {
+            background: #0056cc;
+            transform: translateY(-1px);
+        }
+        
+        .original-image-section {
+            background: #f2f2f2;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+            text-align: center;
+            border: 1px solid #e5e5e7;
+        }
+        .original-image-title {
+            color: #1d1d1f;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        .original-image {
+            width: 400px;
+            height: 400px;
+            object-fit: contain;
+            border: 2px solid #e5e5e7;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease;
+        }
+        .original-image:hover {
+            transform: scale(1.01);
+        }
+        
+        .result-section {
+            margin-bottom: 40px;
+        }
+        .result-section h4 {
+            color: #1d1d1f;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-align: center;
+            font-size: 1.4rem;
+            position: relative;
+        }
+        .result-section h4::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 2px;
+            background: #007aff;
+            border-radius: 1px;
+        }
+        
         .result-card {
-            width: 200px;
-            margin: 14px 10px;
+            width: 280px;
+            margin: 16px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            background: #f6f8fa;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-            padding: 12px 8px 10px 8px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            padding: 20px 16px;
+            transition: all 0.2s ease;
+            border: 1px solid #e5e5e7;
         }
+        .result-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        }
+        
         .result-img {
-            width: 180px;
-            height: 180px;
+            width: 220px;
+            height: 220px;
             object-fit: cover;
-            border-radius: 10px;
-            border: 1px solid #eee;
+            border-radius: 12px;
+            border: 1px solid #e5e5e7;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s ease;
         }
         .result-img:hover {
-            transform: scale(1.04);
-            box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+            transform: scale(1.02);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
         }
+        
         .img-caption {
-            margin-top: 8px;
-            font-size: 1.05rem;
-            color: #333;
-        }
-        .score {
-            font-size: 0.98rem;
+            margin: 16px 0 12px 0;
+            font-size: 1rem;
+            color: #1d1d1f;
             font-weight: 500;
         }
-        .score-high { color: #28a745; }
-        .score-mid { color: #ff9800; }
-        .score-low { color: #e53935; }
-        .footer {
-            margin-top: 32px;
-            color: #aaa;
-            font-size: 0.95rem;
+        
+        .similarity-container {
+            width: 100%;
+            margin: 16px 0;
+        }
+        .similarity-label {
+            font-size: 0.9rem;
+            color: #86868b;
+            margin-bottom: 8px;
+            font-weight: 500;
             text-align: center;
         }
-        .original-img {
-            width: 300px;
-            height: 300px;
-            object-fit: cover;
+        .similarity-bar {
+            width: 100%;
+            height: 8px;
+            background: #d6eaff;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .similarity-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .similarity-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent);
+            animation: shimmer 2s infinite;
+        }
+        .similarity-score {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 8px;
+            text-align: center;
+            padding: 4px 12px;
             border-radius: 12px;
-            border: 2px solid #007bff;
-            margin-bottom: 18px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+            background: #f2f2f2;
+            border: 1px solid #e5e5e7;
         }
-        /* Modal 动画 */
-        .modal.fade .modal-dialog {
-            transform: scale(0.8);
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(.4,2,.6,1);
+        
+        /* 苹果风格的相似度颜色方案 */
+        .similarity-excellent .similarity-fill {
+            background: #34c759;
         }
-        .modal.fade.show .modal-dialog {
-            transform: scale(1);
-            opacity: 1;
+        .similarity-excellent .similarity-score {
+            color: #34c759;
+            background: rgba(52, 199, 89, 0.1);
+            border-color: rgba(52, 199, 89, 0.2);
+        }
+        
+        .similarity-good .similarity-fill {
+            background: #007aff;
+        }
+        .similarity-good .similarity-score {
+            color: #007aff;
+            background: rgba(0, 122, 255, 0.1);
+            border-color: rgba(0, 122, 255, 0.2);
+        }
+        
+        .similarity-fair .similarity-fill {
+            background: #ff9500;
+        }
+        .similarity-fair .similarity-score {
+            color: #ff9500;
+            background: rgba(255, 149, 0, 0.1);
+            border-color: rgba(255, 149, 0, 0.2);
+        }
+        
+        .similarity-poor .similarity-fill {
+            background: #ff3b30;
+        }
+        .similarity-poor .similarity-score {
+            color: #ff3b30;
+            background: rgba(255, 59, 48, 0.1);
+            border-color: rgba(255, 59, 48, 0.2);
+        }
+        
+        .download-btn {
+            background: #007aff;
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            margin-top: 12px;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        .download-btn:hover {
+            background: #0056cc;
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .back-btn {
+            background: #f2f2f2;
+            border: 1px solid #e5e5e7;
+            color: #1d1d1f;
+            padding: 12px 24px;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 1rem;
+            margin-top: 32px;
+            transition: all 0.2s ease;
+        }
+        .back-btn:hover {
+            background: #e5e5e7;
+            color: #1d1d1f;
+            transform: translateY(-1px);
+        }
+        
+        .footer {
+            margin-top: 40px;
+            color: #86868b;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .no-results {
+            text-align: center;
+            color: #86868b;
+            font-style: italic;
+            padding: 60px 20px;
+            font-size: 1rem;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .modal-content {
+            border-radius: 16px;
+            border: none;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        .modal-body {
+            padding: 24px;
+            text-align: center;
+        }
+        .modal-img {
+            max-width: 100%;
+            max-height: 70vh;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px auto;
+                padding: 24px 20px;
+            }
+            .original-image {
+                width: 300px;
+                height: 300px;
+            }
+            .result-card {
+                width: 250px;
+                margin: 12px;
+            }
+            .result-img {
+                width: 180px;
+                height: 180px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container text-center">
-        <img src="https://cdn-icons-png.flaticon.com/512/2922/2922510.png" class="logo" alt="logo"/>
-        <h2 class="mb-4">检索结果</h2>
-        {% if original_img_data %}
-        <div class="mb-4">
-            <div style="font-size:1.08rem;color:#007bff;margin-bottom:6px;">本次上传的原图：</div>
-            <img src="{{ original_img_data }}" alt="原图"
-                 style="width:500px;height:500px;object-fit:contain;border:3px solid #007bff;
-                        border-radius:16px;box-shadow:0 4px 24px rgba(0,123,255,0.15);background:#f4f8ff;margin-bottom:18px;">
+    <div class="container">
+        <div class="text-center">
+            <img src="https://cdn-icons-png.flaticon.com/512/2922/2922510.png" class="logo" alt="logo"/>
+            <h1 class="page-title">检索结果</h1>
         </div>
-        {% elif original_img_path %}
-        <div class="mb-4">
-            <div style="font-size:1.08rem;color:#007bff;margin-bottom:6px;">本次上传的原图：</div>
-            <img src="/static/{{ original_img_path }}" alt="原图"
-                 style="width:500px;height:500px;object-fit:contain;border:3px solid #007bff;
-                        border-radius:16px;box-shadow:0 4px 24px rgba(0,123,255,0.15);background:#f4f8ff;margin-bottom:18px;">
+        
+        {% if selected_features %}
+        <div class="selected-features">
+            <h5>本次检索使用的特征类型</h5>
+            {% for feature in selected_features %}
+                <span class="feature-tag">
+                    {% if feature == 'color' %}🎨 颜色特征
+                    {% elif feature == 'texture' %}🌊 纹理特征
+                    {% elif feature == 'shape' %}🔷 形状特征
+                    {% elif feature == 'resnet' %}🧠 ResNet特征
+                    {% elif feature == 'vgg' %}🔍 VGG特征
+                    {% elif feature == 'fusion' %}⚡ 融合特征
+                    {% else %}{{ feature }}
+                    {% endif %}
+                </span>
+            {% endfor %}
         </div>
         {% endif %}
-        {% for result in all_results %}
-        <div class="mb-4">
-            <h4 style="color:#333;">{{ result.feature_name }} 检索结果</h4>
-            {% if result.error %}
-                <div style="color:red;">出错：{{ result.error }}</div>
-            {% else %}
-            <div class="d-flex flex-wrap justify-content-center mb-2">
-                {% for img in result.result_imgs %}
-                <div class="result-card">
-                    <img src="/static/{{ img }}" class="result-img" alt="结果图片">
-                    <div class="img-caption">结果 {{ loop.index }}</div>
-                    <div class="score {% if result.result_scores[loop.index0] > 0.8 %}score-high{% elif result.result_scores[loop.index0] > 0.5 %}score-mid{% else %}score-low{% endif %}">
-                        相似度：{{ '%.4f' % result.result_scores[loop.index0] }}
-                    </div>
-                    <a href="/static/{{ img }}" download class="btn btn-outline-primary btn-sm mt-2" style="border-radius:8px;min-width:80px;">下载</a>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
+        
+        {% if original_img_data %}
+        <div class="original-image-section">
+            <div class="original-image-title">📸 本次上传的原图</div>
+            <img src="{{ original_img_data }}" alt="原图" class="original-image">
         </div>
-        {% endfor %}
-        <a href="/" class="btn btn-outline-primary">返回首页</a>
+        {% elif original_img_path %}
+        <div class="original-image-section">
+            <div class="original-image-title">📸 本次上传的原图</div>
+            <img src="/static/{{ original_img_path }}" alt="原图" class="original-image">
+        </div>
+        {% endif %}
+        
+        {% if all_results %}
+            {% for result in all_results %}
+            <div class="result-section">
+                <h4>{{ result.feature_name }} 检索结果</h4>
+                {% if result.error %}
+                    <div class="alert alert-danger" role="alert">
+                        <strong>❌ 出错：</strong>{{ result.error }}
+                    </div>
+                {% elif result.result_imgs %}
+                    <div class="d-flex flex-wrap justify-content-center">
+                        {% for img in result.result_imgs %}
+                        <div class="result-card">
+                            <img src="/static/{{ img }}" class="result-img" alt="结果图片" data-img="/static/{{ img }}">
+                            <div class="img-caption">结果 {{ loop.index }}</div>
+                            
+                            <div class="similarity-container">
+                                <div class="similarity-label">相似度</div>
+                                <div class="similarity-bar">
+                                    {% set score = result.result_scores[loop.index0] %}
+                                    {% set percentage = (score * 100) | round(1) %}
+                                    {% if score > 0.8 %}
+                                        {% set class_name = 'similarity-excellent' %}
+                                    {% elif score > 0.6 %}
+                                        {% set class_name = 'similarity-good' %}
+                                    {% elif score > 0.4 %}
+                                        {% set class_name = 'similarity-fair' %}
+                                    {% else %}
+                                        {% set class_name = 'similarity-poor' %}
+                                    {% endif %}
+                                    
+                                    <div class="similarity-fill {{ class_name }}" style="width: {{ percentage }}%"></div>
+                                </div>
+                                <div class="similarity-score {{ class_name }}">
+                                    {{ '%.1f' % percentage }}%
+                                </div>
+                            </div>
+                            
+                            <a href="/static/{{ img }}" download class="btn download-btn">
+                                📥 下载图片
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="no-results">😔 该特征类型没有找到匹配的结果</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-results">😔 没有找到任何检索结果</div>
+        {% endif %}
+        
+        <div class="text-center">
+            <a href="/" class="btn back-btn">🏠 返回首页</a>
+        </div>
+        
         <div class="footer">
-            <span>© 2024 liule66 | CBIR 图像检索系统</span>
+            <span>© 2025 liule66 | CBIR 图像检索系统</span>
         </div>
     </div>
 
-    <!-- Modal for image preview -->
     <div class="modal fade" id="imgModal" tabindex="-1" aria-labelledby="imgModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
-          <div class="modal-body text-center">
-            <img id="modalImg" src="" style="max-width:100%; max-height:70vh; border-radius:12px;" alt="大图预览">
+          <div class="modal-body">
+            <img id="modalImg" src="" class="modal-img" alt="大图预览">
           </div>
         </div>
       </div>
@@ -144,19 +450,30 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // 点击图片弹出大图
         document.addEventListener('DOMContentLoaded', function() {
             var imgModal = document.getElementById('imgModal');
             var modalImg = document.getElementById('modalImg');
+            
             document.querySelectorAll('.result-img').forEach(function(img) {
                 img.addEventListener('click', function() {
                     modalImg.src = this.getAttribute('data-img');
+                    var modal = new bootstrap.Modal(imgModal);
+                    modal.show();
                 });
             });
+            
             imgModal.addEventListener('hidden.bs.modal', function () {
                 modalImg.src = '';
             });
+            
+            setTimeout(function() {
+                document.querySelectorAll('.similarity-fill').forEach(function(bar, index) {
+                    setTimeout(function() {
+                        bar.style.width = bar.style.width;
+                    }, index * 100);
+                });
+            }, 500);
         });
     </script>
 </body>
-</html>
+</html> 
