@@ -208,13 +208,6 @@ uvicorn web_main:app --reload --host 0.0.0.0 --port 8000
 - **综合检索**：选择"融合特征"
 - **全面检索**：使用"全选"功能
 
-### 6. 演示交互式检索功能
-
-运行演示脚本查看详细说明：
-```bash
-python demo_interactive_search.py
-```
-
 ## 增量索引详细说明
 
 ### 优势
